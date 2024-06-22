@@ -20,7 +20,18 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
 )
 #css
-
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+   h1 {
+      font-size: 60px;
+      font-weight: 700
+      text-align: left;
+      text-transform: uppercase;
+      font-family: "Montserrat" 
+   }
+</style>
+""", unsafe_allow_html=True)
     
 # File to store generated challenges
 GENERATED_CHALLENGES_FILE = 'generated_challenges.json'
@@ -116,7 +127,7 @@ if 'solution_revealed' not in st.session_state:
     st.session_state.solution_revealed = False
 
 #header
-st.title("Overcode")
+st.title("OVERCODE.")
 # Select challenge type
 st.markdown("## Select Challenge Type")
 challenge_type = st.selectbox(
