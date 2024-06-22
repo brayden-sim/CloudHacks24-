@@ -19,7 +19,9 @@ model = genai.GenerativeModel(
     model_name="gemini-1.5-flash",
     generation_config=generation_config,
 )
+#css
 
+    
 # File to store generated challenges
 GENERATED_CHALLENGES_FILE = 'generated_challenges.json'
 
@@ -113,6 +115,8 @@ if 'feedback' not in st.session_state:
 if 'solution_revealed' not in st.session_state:
     st.session_state.solution_revealed = False
 
+#header
+st.title("Overcode")
 # Select challenge type
 st.markdown("## Select Challenge Type")
 challenge_type = st.selectbox(
