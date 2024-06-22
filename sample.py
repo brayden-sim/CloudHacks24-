@@ -1,29 +1,8 @@
-import os
 import streamlit as st
-import streamlit.components.v1 as components
 import google.generativeai as genai
-import random
-import csv
 
 # Configure the Gemini API
 genai.configure(api_key="AIzaSyAZ7myOXP5C5GS4wOq5X4yTstZ2ttH5eos")
-
-# Text to Speech TTS JavaScript Function
-tts_script = """
-<script>
-    function speakText(text) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        window.speechSynthesis.speak(utterance);
-    }
-
-    function speakElement(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            speakText(element.innerText || element.textContent);
-        }
-    }
-</script>
-"""
 
 # Create the model configuration
 generation_config = {
@@ -39,17 +18,6 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
 )
 
-# Predefined list of jokes
-jokes = [
-    "Why do programmers prefer dark mode? Because light attracts bugs!",
-    "How many programmers does it take to change a light bulb? None. It's a hardware problem.",
-    "Why do Java developers wear glasses? Because they don't C#.",
-    "What's a programmer's favorite hangout place? Foo Bar.",
-    "Why do programmers hate nature? It has too many bugs.",
-    "What is a programmer's favorite snack? Computer chips.",
-    "Why do Python programmers prefer snake case? Because it's_underscoreable."
-]
-
 # Function to generate a coding challenge
 def generate_challenge(difficulty):
     difficulty_map = {
@@ -64,132 +32,61 @@ def generate_challenge(difficulty):
 # Function to get AI feedback
 def get_feedback(code):
     chat_session = model.start_chat(history=[])
-    response = chat_session.send_message(f"Provide feedback on the following code:\n\n{code}")
+    response = chat_session.send_message(f"Evaluate the correctness of this Python code:\n{code}")
     return response.text.strip()
-
-# Function to execute code line-by-line and capture variables
-def execute_code_line_by_line(code_lines, current_line, exec_globals):
-    exec_locals = {}
-    try:
-        exec("\n".join(code_lines[:current_line + 1]), exec_globals, exec_locals)
-        return exec_locals
-    except Exception as e:
-        return str(e)
 
 # Initialize session state
 if 'points' not in st.session_state:
     st.session_state.points = 0
 
 if 'difficulty' not in st.session_state:
-    st.session_state.difficulty = 'Easy'
+    st.session_state.difficulty = None
 
 if 'challenge' not in st.session_state:
-    st.session_state.challenge = generate_challenge(st.session_state.difficulty)
+    st.session_state.challenge = None
 
-if 'code_lines' not in st.session_state:
-    st.session_state.code_lines = []
+if 'feedback' not in st.session_state:
+    st.session_state.feedback = ""
 
-if 'current_line' not in st.session_state:
-    st.session_state.current_line = 0
+# Difficulty selection
+st.title("AI-Powered Python Challenge")
+difficulty = st.selectbox("Select difficulty", ['Easy', 'Medium', 'Hard'])
 
-if 'exec_globals' not in st.session_state:
-    st.session_state.exec_globals = {}
-
-# Header
-st.title("LearnCode FunZone")
-st.header("Welcome to the Coding Challenges Platform!")
-st.subheader("Complete challenges, earn points, and get instant feedback!")
-
-# Difficulty Selection
-difficulty = st.selectbox("Select Difficulty", ['Easy', 'Medium', 'Hard'], index=['Easy', 'Medium', 'Hard'].index(st.session_state.difficulty))
-if difficulty != st.session_state.difficulty:
+if st.button("Generate Challenge"):
     st.session_state.difficulty = difficulty
     st.session_state.challenge = generate_challenge(difficulty)
+    st.session_state.feedback = ""
 
-# Display Coding Challenge
-st.markdown("### Your Coding Challenge")
-st.write(st.session_state.challenge)
+# Display the challenge
+if st.session_state.challenge:
+    st.markdown(f"## Current Challenge ({st.session_state.difficulty})")
+    st.markdown(st.session_state.challenge)
 
-# Code Input
-code_input = st.text_area("Your Code:", height=200)
-if st.button("Submit Code"):
-    st.session_state.code_lines = code_input.split('\n')
-    st.session_state.current_line = 0
-    st.session_state.exec_globals = {}
-    st.success("Code submitted! Start debugging below.")
+    # User code input
+    user_code = st.text_area("Write your code here", height=200)
 
+    if st.button("Submit Code"):
+        feedback = get_feedback(user_code)
+        st.session_state.feedback = feedback
 
-# Function to insert feedback into a CSV file
-def insert_feedback_to_csv(rating, feedback):
-    with open('feedback.csv', 'a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow([rating, feedback])
+        if "correct" in feedback.lower() or "acceptable" in feedback.lower():
+            points_awarded = {"Easy": 10, "Medium": 20, "Hard": 30}[st.session_state.difficulty]
+            st.session_state.points += points_awarded
+            st.success(f"Correct! You've been awarded {points_awarded} points.")
+        else:
+            st.error("Incorrect. Please try again.")
 
-# UI for feedback
-st.markdown("### Rate this Challenge")
-rating = st.slider("Rating", min_value=1, max_value=5, value=3)
-feedback = st.text_area("Feedback")
-
-# Button to submit feedback
-if st.button("Submit Feedback"):
-    if rating and feedback:
-        insert_feedback_to_csv(rating, feedback)
-        st.success("Thank you for your feedback! It has been saved.")
-    else:
-        st.error("Please provide both a rating and feedback.")
-
-# Button to view feedback
-if st.button("View Feedback"):
-    with open('feedback.csv', 'r', newline='', encoding='utf-8') as file:
-        reader = csv.reader(file)
-        feedback_data = list(reader)
-    for row in feedback_data:
-        st.write(f"Rating: {row[0]}")
-        st.write(f"Feedback: {row[1]}")
-        st.write("---")
+    # Display feedback
+    if st.session_state.feedback:
+        st.markdown("### AI Feedback")
+        st.write(st.session_state.feedback)
 
 # Points Display
 st.markdown(f"## Your Points: {st.session_state.points}")
 
-# Debugging Section
-if st.session_state.code_lines:
-    if st.session_state.current_line < len(st.session_state.code_lines):
-        current_line_code = st.session_state.code_lines[st.session_state.current_line]
-        st.markdown(f"### Line {st.session_state.current_line + 1}")
-        st.code(current_line_code)
-
-        # Execute the current line and capture variable states
-        exec_locals = execute_code_line_by_line(st.session_state.code_lines, st.session_state.current_line, st.session_state.exec_globals)
-        
-        # Display current variable states
-        st.markdown("### Current Variables")
-        st.write(exec_locals)
-        
-        if st.button("Next Line"):
-            st.session_state.current_line += 1
-
-        if st.button("Step In"):
-            # Provide more detailed step-in feedback (simulate step-in behavior)
-            feedback = get_feedback(current_line_code)
-            st.markdown("### Step-In Feedback")
-            st.write(feedback)
-        
-        if st.session_state.current_line > 0 and st.button("Step Out"):
-            st.session_state.current_line -= 1
-    else:
-        st.success("End of code reached. Debugging completed.")
-
 # Generate a new challenge
-if st.button("Skip Challenge"):
-    st.session_state.challenge = generate_challenge(st.session_state.difficulty)
-
-# Joke of the Day (optional fun feature)
-if st.button("Tell me a joke"):
-    joke = random.choice(jokes)
-    st.write(joke)
-
-    components.html(f"""
-    {tts_script}
-    <button onclick="speakElement('joke-text')">🔊 Read Joke</button>
-    <p id="joke-text" style="display:none">{joke}</p>
-    """, height=60)
+if st.button("Next Challenge"):
+    st.session_state.difficulty = None
+    st.session_state.challenge = None
+    st.session_state.feedback = ""
+    st.experimental_rerun()
