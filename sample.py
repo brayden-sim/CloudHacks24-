@@ -26,13 +26,19 @@ def generate_challenge(difficulty):
         'Hard': 'a hard'
     }
     chat_session = model.start_chat(history=[])
-    response = chat_session.send_message(f"Generate {difficulty_map[difficulty]} coding challenge for beginners in Python.")
+    response = chat_session.send_message(f"Generate {difficulty_map[difficulty]} coding challenge for beginners in Python. Include only the description, sample input, and sample output. Do not generate any solutions. Give hints such as what functions or methods to use.")
     return response.text.strip()
 
 # Function to get AI feedback
 def get_feedback(code):
     chat_session = model.start_chat(history=[])
     response = chat_session.send_message(f"Evaluate the correctness of this Python code:\n{code}")
+    return response.text.strip()
+
+# Function to get AI solution
+def get_solution():
+    chat_session = model.start_chat(history=[])
+    response = chat_session.send_message(f"Generate the solution for this coding challenge:\n{st.session_state.challenge}")
     return response.text.strip()
 
 # Initialize session state
@@ -48,6 +54,9 @@ if 'challenge' not in st.session_state:
 if 'feedback' not in st.session_state:
     st.session_state.feedback = ""
 
+if 'solution_revealed' not in st.session_state:
+    st.session_state.solution_revealed = False
+
 # Difficulty selection
 st.title("AI-Powered Python Challenge")
 difficulty = st.selectbox("Select difficulty", ['Easy', 'Medium', 'Hard'])
@@ -56,6 +65,7 @@ if st.button("Generate Challenge"):
     st.session_state.difficulty = difficulty
     st.session_state.challenge = generate_challenge(difficulty)
     st.session_state.feedback = ""
+    st.session_state.solution_revealed = False
 
 # Display the challenge
 if st.session_state.challenge:
@@ -65,7 +75,7 @@ if st.session_state.challenge:
     # User code input
     user_code = st.text_area("Write your code here", height=200)
 
-    if st.button("Submit Code"):
+    if st.button("Submit Code") and not st.session_state.solution_revealed:
         feedback = get_feedback(user_code)
         st.session_state.feedback = feedback
 
@@ -81,6 +91,13 @@ if st.session_state.challenge:
         st.markdown("### AI Feedback")
         st.write(st.session_state.feedback)
 
+    # Button to reveal the solution
+    if st.button("Reveal Solution"):
+        st.session_state.solution_revealed = True
+        solution = get_solution()
+        st.markdown("### AI Solution")
+        st.write(solution)
+
 # Points Display
 st.markdown(f"## Your Points: {st.session_state.points}")
 
@@ -89,4 +106,5 @@ if st.button("Next Challenge"):
     st.session_state.difficulty = None
     st.session_state.challenge = None
     st.session_state.feedback = ""
+    st.session_state.solution_revealed = False
     st.experimental_rerun()
