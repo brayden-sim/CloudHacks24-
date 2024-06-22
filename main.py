@@ -1,13 +1,10 @@
 import streamlit as st
 import google.generativeai as genai
 import random
-from streamlit-lottie import st.lottie
 
 # Configure the Gemini API
 genai.configure(api_key="AIzaSyAZ7myOXP5C5GS4wOq5X4yTstZ2ttH5eos")
 
-#load assets 
-lottie_coding = "https://lottie.host/f5183cd9-ab2e-4ce2-be66-2a89cbc64ed0/EsKgYfl7Wl.lottie"
 # Create the model configuration
 generation_config = {
     "temperature": 0.75,
@@ -61,8 +58,8 @@ if 'challenge' not in st.session_state:
     st.session_state.challenge = generate_challenge(st.session_state.difficulty)
 
 # Header
-st.title("Overcode")
-st.header("Welcome to the Coding Challenge Platform!")
+st.title("LearnCode FunZone")
+st.header("Welcome to the Coding Challenges Platform!")
 st.subheader("Complete challenges, earn points, and get instant feedback!")
 
 # Difficulty Selection
