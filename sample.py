@@ -32,13 +32,13 @@ def generate_challenge(difficulty):
 # Function to get AI feedback
 def get_feedback(code):
     chat_session = model.start_chat(history=[])
-    response = chat_session.send_message(f"Evaluate the correctness of this Python code:\n{code}")
+    response = chat_session.send_message(f"Evaluate the correctness of this Python code and provide specific feedback based on code provided:\n{code}")
     return response.text.strip()
 
 # Function to get AI solution
 def get_solution():
     chat_session = model.start_chat(history=[])
-    response = chat_session.send_message(f"Generate the solution for this coding challenge:\n{st.session_state.challenge}")
+    response = chat_session.send_message(f"Generate the solution for this coding challenge. When using more advanced methods and functions, provide more comments to guide the users:\n{st.session_state.challenge}")
     return response.text.strip()
 
 # Initialize session state
@@ -100,8 +100,9 @@ if st.session_state.challenge:
             st.write(st.session_state.feedback)
 
         # Button to reveal the solution
-        if st.button("Reveal Solution"):
+        if st.button("Reveal Solution (Forfeit points)"):
             st.session_state.solution_revealed = True
+            st.error("You will not be able to submit your solution once solutions have been revealed.")
             st.experimental_rerun()
 
 # Points Display
