@@ -1,9 +1,28 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import google.generativeai as genai
 import random
+import csv
 
 # Configure the Gemini API
 genai.configure(api_key="AIzaSyAZ7myOXP5C5GS4wOq5X4yTstZ2ttH5eos")
+
+# Text to Speech TTS JavaScript Function
+tts_script = """
+<script>
+    function speakText(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function speakElement(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            speakText(element.innerText || element.textContent);
+        }
+    }
+</script>
+"""
 
 # Create the model configuration
 generation_config = {
@@ -87,6 +106,36 @@ if st.button("Submit Code"):
     st.markdown("### AI Feedback")
     st.write(feedback)
 
+
+# Function to insert feedback into a CSV file
+def insert_feedback_to_csv(rating, feedback):
+    with open('feedback.csv', 'a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow([rating, feedback])
+
+# UI for feedback
+st.markdown("### Rate this Challenge")
+rating = st.slider("Rating", min_value=1, max_value=5, value=3)
+feedback = st.text_area("Feedback")
+
+# Button to submit feedback
+if st.button("Submit Feedback"):
+    if rating and feedback:
+        insert_feedback_to_csv(rating, feedback)
+        st.success("Thank you for your feedback! It has been saved.")
+    else:
+        st.error("Please provide both a rating and feedback.")
+
+# Button to view feedback
+if st.button("View Feedback"):
+    with open('feedback.csv', 'r', newline='', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        feedback_data = list(reader)
+    for row in feedback_data:
+        st.write(f"Rating: {row[0]}")
+        st.write(f"Feedback: {row[1]}")
+        st.write("---")
+
 # Points Display
 st.markdown(f"## Your Points: {st.session_state.points}")
 
@@ -96,4 +145,11 @@ if st.button("Skip Challenge"):
 
 # Joke of the Day (optional fun feature)
 if st.button("Tell me a joke"):
-    st.write(random.choice(jokes))
+    joke = random.choice(jokes)
+    st.write(joke)
+
+    components.html(f"""
+    {tts_script}
+    <button onclick="speakElement('joke-text')">🔊 Read Joke</button>
+    <p id="joke-text" style="display:none">{joke}</p>
+    """, height=60)
