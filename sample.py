@@ -25,8 +25,11 @@ GENERATED_CHALLENGES_FILE = 'generated_challenges.json'
 
 # Load generated challenges
 if os.path.exists(GENERATED_CHALLENGES_FILE):
-    with open(GENERATED_CHALLENGES_FILE, 'r') as file:
-        generated_challenges = json.load(file)
+    try:
+        with open(GENERATED_CHALLENGES_FILE, 'r') as file:
+            generated_challenges = json.load(file)
+    except json.JSONDecodeError:
+        generated_challenges = []
 else:
     generated_challenges = []
 
