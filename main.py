@@ -9,7 +9,10 @@ import random
 import time
 import base64
 from streamlit_navigation_bar import st_navbar
-from streamlit_lottie import st_lottie 
+from streamlit_lottie import st_lottie
+import pandas as pd
+import matplotlib.pyplot as plt
+
 
 
 #login
@@ -73,6 +76,8 @@ lottie_congrats = load_lottiefile("congrats.json");
 
 # File to store generated challenges
 GENERATED_CHALLENGES_FILE = 'generated_challenges.json'
+PROGRESS_FILE = 'progress.json'
+
 
 # Load generated challenges
 if os.path.exists(GENERATED_CHALLENGES_FILE):
@@ -83,6 +88,26 @@ if os.path.exists(GENERATED_CHALLENGES_FILE):
         generated_challenges = []
 else:
     generated_challenges = []
+
+# Function to record challenge completion
+def record_challenge_completion(challenge_type, difficulty, time_taken):
+    progress_data = {
+        "challenge_type": challenge_type,
+        "difficulty": difficulty,
+        "time_taken": time_taken,
+        "timestamp": time.time()
+    }
+    
+    if os.path.exists(PROGRESS_FILE):
+        with open(PROGRESS_FILE, 'r') as f:
+            progress = json.load(f)
+    else:
+        progress = []
+    
+    progress.append(progress_data)
+    
+    with open(PROGRESS_FILE, 'w') as f:
+        json.dump(progress, f)
 
 # Function to generate a coding challenge
 def generate_challenge(difficulty, challenge_type):
@@ -161,126 +186,169 @@ if 'solution_revealed' not in st.session_state:
     st.session_state.solution_revealed = False
 
 #NAVIGATION BAR
-page = st_navbar(["Home", "Documentation", "Leaderboard", "About"])
+page = st_navbar(["Home", "Documentation", "Leaderboard", "About", "Progress"])
 st.write(page)
 
-#header
-st.title("OVERCODE.")
-# Select challenge type
-st.markdown("## Select Challenge Type")
-challenge_type = st.selectbox(
-    "Choose the type of coding challenge:",
-    ['Arrays', 'Dictionaries', 'Coordinates', 'Strings', 'Linked Lists', 'Trees', 'Graphs', 'Dynamic Programming']
-)
+if page == "Home":
 
-# Select difficulty
-st.markdown("## Select Difficulty")
-difficulty = st.selectbox(
-    "Choose the difficulty of the challenge:",
-    ['Easy', 'Medium', 'Hard']
-)
+    #header
+    st.title("OVERCODE.")
+    # Select challenge type
+    st.markdown("## Select Challenge Type")
+    challenge_type = st.selectbox(
+        "Choose the type of coding challenge:",
+        ['Arrays', 'Dictionaries', 'Coordinates', 'Strings', 'Linked Lists', 'Trees', 'Graphs', 'Dynamic Programming']
+    )
 
-# Button to generate a challenge
-if st.button("Generate Challenge"):
-    st.session_state.difficulty = difficulty
-    st.session_state.challenge_type = challenge_type
-    st.session_state.challenge = generate_challenge(difficulty, challenge_type)
-    st.session_state.solution_revealed = False
+    # Select difficulty
+    st.markdown("## Select Difficulty")
+    difficulty = st.selectbox(
+        "Choose the difficulty of the challenge:",
+        ['Easy', 'Medium', 'Hard']
+    )
 
-# Display the challenge and solution if solution is revealed
-if st.session_state.challenge:
-    if st.session_state.solution_revealed:
-        st.markdown(f"## Current Challenge ({st.session_state.difficulty})")
-        st.markdown(st.session_state.challenge)
+    # Button to generate a challenge
+    if st.button("Generate Challenge"):
+        st.session_state.difficulty = difficulty
+        st.session_state.challenge_type = challenge_type
+        st.session_state.challenge = generate_challenge(difficulty, challenge_type)
+        st.session_state.solution_revealed = False
 
-        solution = get_solution()
-        st.markdown("### AI Solution")
-        st.write(solution)
-    else:
-        st.markdown(f"## Current Challenge ({st.session_state.difficulty})")
-        st.markdown(st.session_state.challenge)
+    # Display the challenge and solution if solution is revealed
+    if st.session_state.challenge:
+        if st.session_state.solution_revealed:
+            st.markdown(f"## Current Challenge ({st.session_state.difficulty})")
+            st.markdown(st.session_state.challenge)
 
-        # User code input
-        user_code = st.text_area("Write your code here", height=200)
+            solution = get_solution()
+            st.markdown("### AI Solution")
+            st.write(solution)
+        else:
+            st.markdown(f"## Current Challenge ({st.session_state.difficulty})")
+            st.markdown(st.session_state.challenge)
 
-        if st.button("Submit Code") and not st.session_state.solution_revealed:
-            feedback = get_feedback(user_code, st.session_state.challenge)
-            st.session_state.feedback = feedback
+            # User code input
+            user_code = st.text_area("Write your code here", height=200)
 
-            if "Good Job!" in feedback:
-                points_awarded = {"Easy": 10, "Medium": 20, "Hard": 30}[st.session_state.difficulty]
-                st.session_state.points += points_awarded
-                st.success(f"Correct! You've been awarded {points_awarded} points.")
-                congrats_placeholder = st.empty()
-                with congrats_placeholder:
-                     st_lottie(lottie_congrats, speed=0.75, quality="high", height=200, width=200 )
-                time.sleep(1.5)
-                congrats_placeholder.empty()
+            if st.button("Submit Code") and not st.session_state.solution_revealed:
+                feedback = get_feedback(user_code, st.session_state.challenge)
+                st.session_state.feedback = feedback
 
-            else:
-                st.error("Incorrect. Please try again.")
-            st.session_state.solution_revealed = True
+                if "Good Job!" in feedback:
+                    points_awarded = {"Easy": 10, "Medium": 20, "Hard": 30}[st.session_state.difficulty]
+                    st.session_state.points += points_awarded
+                    st.success(f"Correct! You've been awarded {points_awarded} points.")
+                    congrats_placeholder = st.empty()
+                    with congrats_placeholder:
+                        st_lottie(lottie_congrats, speed=0.75, quality="high", height=200, width=200 )
+                    time.sleep(1.5)
+                    congrats_placeholder.empty()
 
-        # Display feedback
-        if st.session_state.feedback:
-            st.markdown("### AI Feedback")
-            st.write(st.session_state.feedback)
+                else:
+                    st.error("Incorrect. Please try again.")
+                st.session_state.solution_revealed = True
 
-        # Button to reveal the solution
-        if st.button("Reveal Solution (Forfeit points)"):
-            st.session_state.solution_revealed = True
-            st.error("You will not be able to submit your solution once solutions have been revealed.")
-            st.experimental_rerun()
+            # Display feedback
+            if st.session_state.feedback:
+                st.markdown("### AI Feedback")
+                st.write(st.session_state.feedback)
 
-# Points Display
-st.markdown(f"## Your Points: {st.session_state.points}")
+            # Button to reveal the solution
+            if st.button("Reveal Solution (Forfeit points)"):
+                st.session_state.solution_revealed = True
+                st.error("You will not be able to submit your solution once solutions have been revealed.")
+                st.experimental_rerun()
 
-# Generate a new challenge
-if st.button("Next Challenge"):
-    st.session_state.difficulty = None
-    st.session_state.challenge_type = None
-    st.session_state.challenge = None
-    st.session_state.feedback = ""
-    st.session_state.solution_revealed = False
-    st.experimental_rerun()
+    # Points Display
+    st.markdown(f"## Your Points: {st.session_state.points}")
 
-# Predefined list of jokes
-jokes = [
-    "Why do programmers prefer dark mode? Because light attracts bugs!",
-    "How many programmers does it take to change a light bulb? None. It's a hardware problem.",
-    "Why do Java developers wear glasses? Because they don't C#.",
-    "Why do programmers hate nature? It has too many bugs.",
-    "Why did the programmer go broke? Because he used up all his cache.",
-    "What is a programmer's favorite snack? Computer chips.",
-    "Why did the programmer quit his job? Because he didn't get arrays.",
-    "What's a pirate's favorite programming language? R!",
-]
+    # Generate a new challenge
+    if st.button("Next Challenge"):
+        st.session_state.difficulty = None
+        st.session_state.challenge_type = None
+        st.session_state.challenge = None
+        st.session_state.feedback = ""
+        st.session_state.solution_revealed = False
+        st.experimental_rerun()
 
-# Text to Speech TTS JavaScript Function
-tts_script = """
-<script>
-    function speakText(text) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        window.speechSynthesis.speak(utterance);
-    }
-    function speakElement(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            speakText(element.innerText || element.textContent);
+    # Predefined list of jokes
+    jokes = [
+        "Why do programmers prefer dark mode? Because light attracts bugs!",
+        "How many programmers does it take to change a light bulb? None. It's a hardware problem.",
+        "Why do Java developers wear glasses? Because they don't C#.",
+        "Why do programmers hate nature? It has too many bugs.",
+        "Why did the programmer go broke? Because he used up all his cache.",
+        "What is a programmer's favorite snack? Computer chips.",
+        "Why did the programmer quit his job? Because he didn't get arrays.",
+        "What's a pirate's favorite programming language? R!",
+    ]
+
+    # Text to Speech TTS JavaScript Function
+    tts_script = """
+    <script>
+        function speakText(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(utterance);
         }
-    }
-</script>
-"""
+        function speakElement(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                speakText(element.innerText || element.textContent);
+            }
+        }
+    </script>
+    """
 
-# Joke of the Day (optional fun feature)
-st.header("")
-st.write("Feeling tired? Check out some jokes!")
-if st.button("Tell me a joke"):
-    joke = random.choice(jokes)
-    st.write(joke)
+    # Joke of the Day (optional fun feature)
+    st.header("")
+    st.write("Feeling tired? Check out some jokes!")
+    if st.button("Tell me a joke"):
+        joke = random.choice(jokes)
+        st.write(joke)
 
-    components.html(f"""
-    {tts_script}
-    <button onclick="speakElement('joke-text')">👂 Read Joke!</button>
-    <p id="joke-text" style="display:none">{joke}</p>
-    """, height=60)
+        components.html(f"""
+        {tts_script}
+        <button onclick="speakElement('joke-text')">👂 Read Joke!</button>
+        <p id="joke-text" style="display:none">{joke}</p>
+        """, height=60)
+        
+elif page == "Progress":
+    st.title("Progress")
+    
+    if os.path.exists(PROGRESS_FILE):
+        with open(PROGRESS_FILE, 'r') as f:
+            progress = json.load(f)
+        
+        if progress:
+            df = pd.DataFrame(progress)
+            st.write("### Challenge Completion Stats")
+            st.write(df)
+            
+            # Pie chart of challenge types
+            challenge_counts = df['challenge_type'].value_counts()
+            fig1, ax1 = plt.subplots()
+            ax1.pie(challenge_counts, labels=challenge_counts.index, autopct='%1.1f%%', startangle=90)
+            ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+            st.write("#### Distribution of Challenge Types")
+            st.pyplot(fig1)
+            
+            # Bar chart of difficulty levels
+            difficulty_counts = df['difficulty'].value_counts()
+            fig2, ax2 = plt.subplots()
+            ax2.bar(difficulty_counts.index, difficulty_counts)
+            ax2.set_xlabel("Difficulty Level")
+            ax2.set_ylabel("Number of Challenges")
+            st.write("#### Challenges by Difficulty Level")
+            st.pyplot(fig2)
+            
+            # Histogram of time taken
+            fig3, ax3 = plt.subplots()
+            ax3.hist(df['time_taken'], bins=10)
+            ax3.set_xlabel("Time Taken (seconds)")
+            ax3.set_ylabel("Number of Challenges")
+            st.write("#### Time Taken for Challenges")
+            st.pyplot(fig3)
+        else:
+            st.write("No progress data available.")
+    else:
+        st.write("No progress data available.")
