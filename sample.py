@@ -67,36 +67,42 @@ if st.button("Generate Challenge"):
     st.session_state.feedback = ""
     st.session_state.solution_revealed = False
 
-# Display the challenge
+# Display the challenge and solution if solution is revealed
 if st.session_state.challenge:
-    st.markdown(f"## Current Challenge ({st.session_state.difficulty})")
-    st.markdown(st.session_state.challenge)
+    if st.session_state.solution_revealed:
+        st.markdown(f"## Current Challenge ({st.session_state.difficulty})")
+        st.markdown(st.session_state.challenge)
 
-    # User code input
-    user_code = st.text_area("Write your code here", height=200)
-
-    if st.button("Submit Code") and not st.session_state.solution_revealed:
-        feedback = get_feedback(user_code)
-        st.session_state.feedback = feedback
-
-        if "correct" in feedback.lower() or "acceptable" in feedback.lower():
-            points_awarded = {"Easy": 10, "Medium": 20, "Hard": 30}[st.session_state.difficulty]
-            st.session_state.points += points_awarded
-            st.success(f"Correct! You've been awarded {points_awarded} points.")
-        else:
-            st.error("Incorrect. Please try again.")
-
-    # Display feedback
-    if st.session_state.feedback:
-        st.markdown("### AI Feedback")
-        st.write(st.session_state.feedback)
-
-    # Button to reveal the solution
-    if st.button("Reveal Solution"):
-        st.session_state.solution_revealed = True
         solution = get_solution()
         st.markdown("### AI Solution")
         st.write(solution)
+    else:
+        st.markdown(f"## Current Challenge ({st.session_state.difficulty})")
+        st.markdown(st.session_state.challenge)
+
+        # User code input
+        user_code = st.text_area("Write your code here", height=200)
+
+        if st.button("Submit Code") and not st.session_state.solution_revealed:
+            feedback = get_feedback(user_code)
+            st.session_state.feedback = feedback
+
+            if "correct" in feedback.lower() or "acceptable" in feedback.lower():
+                points_awarded = {"Easy": 10, "Medium": 20, "Hard": 30}[st.session_state.difficulty]
+                st.session_state.points += points_awarded
+                st.success(f"Correct! You've been awarded {points_awarded} points.")
+            else:
+                st.error("Incorrect. Please try again.")
+
+        # Display feedback
+        if st.session_state.feedback:
+            st.markdown("### AI Feedback")
+            st.write(st.session_state.feedback)
+
+        # Button to reveal the solution
+        if st.button("Reveal Solution"):
+            st.session_state.solution_revealed = True
+            st.experimental_rerun()
 
 # Points Display
 st.markdown(f"## Your Points: {st.session_state.points}")
