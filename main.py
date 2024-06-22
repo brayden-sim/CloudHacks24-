@@ -102,17 +102,13 @@ def generate_challenge(difficulty, challenge_type):
         'Dynamic Programming': 'using dynamic programming'
     }
 
-    # Check if the challenge has been generated before
-    for challenge in generated_challenges:
-        if challenge['difficulty'] == difficulty and challenge['type'] == challenge_type:
-            return challenge['text']
-
-    # Generate a new challenge if not found
+    # Generate a new challenge
     chat_session = model.start_chat(history=[])
     response = chat_session.send_message(
         f"Generate {difficulty_map[difficulty]} coding challenge for beginners in Python {type_map[challenge_type]}. "
         f"Include only the description, sample input, and sample output. Do not generate any solutions. "
         f"Give hints such as what functions or methods to use."
+        f"Do not use repeat any challenges found in {generated_challenges}"
     )
     challenge_text = response.text.strip()
 
