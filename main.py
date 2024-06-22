@@ -1,7 +1,9 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import google.generativeai as genai
 import os
 import json
+import random
 
 # Configure the Gemini API
 genai.configure(api_key="AIzaSyAZ7myOXP5C5GS4wOq5X4yTstZ2ttH5eos")
@@ -164,6 +166,7 @@ if st.session_state.challenge:
                 st.success(f"Correct! You've been awarded {points_awarded} points.")
             else:
                 st.error("Incorrect. Please try again.")
+            st.session_state.solution_revealed = True
 
         # Display feedback
         if st.session_state.feedback:
@@ -187,3 +190,44 @@ if st.button("Next Challenge"):
     st.session_state.feedback = ""
     st.session_state.solution_revealed = False
     st.experimental_rerun()
+
+# Predefined list of jokes
+jokes = [
+    "Why do programmers prefer dark mode? Because light attracts bugs!",
+    "How many programmers does it take to change a light bulb? None. It's a hardware problem.",
+    "Why do Java developers wear glasses? Because they don't C#.",
+    "Why do programmers hate nature? It has too many bugs.",
+    "Why did the programmer go broke? Because he used up all his cache.",
+    "What is a programmer's favorite snack? Computer chips.",
+    "Why did the programmer quit his job? Because he didn't get arrays.",
+    "What's a pirate's favorite programming language? R!",
+]
+
+# Text to Speech TTS JavaScript Function
+tts_script = """
+<script>
+    function speakText(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+    }
+    function speakElement(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            speakText(element.innerText || element.textContent);
+        }
+    }
+</script>
+"""
+
+# Joke of the Day (optional fun feature)
+st.header("")
+st.write("Feeling peckish? Check out some jokes!")
+if st.button("Tell me a joke"):
+    joke = random.choice(jokes)
+    st.write(joke)
+
+    components.html(f"""
+    {tts_script}
+    <button onclick="speakElement('joke-text')">👂 Read Joke!</button>
+    <p id="joke-text" style="display:none">{joke}</p>
+    """, height=60)
