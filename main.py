@@ -354,4 +354,4 @@ elif page == "Progress":
         st.write("No progress data available.")
 elif page == "About":
     st.title("About")
-    st.write("Overcoding is a streamlined platform built on Streamlit, designed for users to enhance their coding skills effectively. Whether you're a novice or an experienced programmer, Overcoding offers tailored learning modules in Easy, Medium, and Hard difficulty levels")
+    st.write("Overcode is a streamlined platform built on Streamlit, designed for users to enhance their coding skills effectively. Whether you're a novice or an experienced programmer, Overcode offers tailored learning modules in Easy, Medium, and Hard difficulty levels")
