@@ -232,7 +232,7 @@ tts_script = """
 
 # Joke of the Day (optional fun feature)
 st.header("")
-st.write("Feeling peckish? Check out some jokes!")
+st.write("Feeling tired? Check out some jokes!")
 if st.button("Tell me a joke"):
     joke = random.choice(jokes)
     st.write(joke)
