@@ -7,6 +7,7 @@ import os
 import json
 import random
 import time
+import base64
 from streamlit_navigation_bar import st_navbar
 from streamlit_lottie import st_lottie 
 
@@ -31,10 +32,27 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
 )
 #css
+
+
+
+background_image = """
+<style>
+[data-testid="stAppViewContainer"] > .main {
+    background-image: url("https://coolbackgrounds.io/images/backgrounds/blue/blue-trianglify-8e4a0501.jpg");
+    background-size: 100vw 100vh;  # This sets the size to cover 100% of the viewport width and height
+    background-position: center;  
+    background-repeat: no-repeat;
+}
+</style>
+"""
+
+st.markdown(background_image, unsafe_allow_html=True)
+
+
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
-   h1 {
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');        
+    h1 {
       font-size: 60px;
       font-weight: 700
       text-align: left;
@@ -202,7 +220,7 @@ if st.session_state.challenge:
                      st_lottie(lottie_congrats, speed=0.75, quality="high", height=200, width=200 )
                 time.sleep(1.5)
                 congrats_placeholder.empty()
-                
+
             else:
                 st.error("Incorrect. Please try again.")
             st.session_state.solution_revealed = True
