@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import google.generativeai as genai
 import random
@@ -47,6 +48,15 @@ def get_feedback(code):
     response = chat_session.send_message(f"Provide feedback on the following code:\n\n{code}")
     return response.text.strip()
 
+# Function to execute code line-by-line and capture variables
+def execute_code_line_by_line(code_lines, current_line, exec_globals):
+    exec_locals = {}
+    try:
+        exec("\n".join(code_lines[:current_line + 1]), exec_globals, exec_locals)
+        return exec_locals
+    except Exception as e:
+        return str(e)
+
 # Initialize session state
 if 'points' not in st.session_state:
     st.session_state.points = 0
@@ -56,6 +66,15 @@ if 'difficulty' not in st.session_state:
 
 if 'challenge' not in st.session_state:
     st.session_state.challenge = generate_challenge(st.session_state.difficulty)
+
+if 'code_lines' not in st.session_state:
+    st.session_state.code_lines = []
+
+if 'current_line' not in st.session_state:
+    st.session_state.current_line = 0
+
+if 'exec_globals' not in st.session_state:
+    st.session_state.exec_globals = {}
 
 # Header
 st.title("LearnCode FunZone")
@@ -75,20 +94,41 @@ st.write(st.session_state.challenge)
 # Code Input
 code_input = st.text_area("Your Code:", height=200)
 if st.button("Submit Code"):
-    # Simple check for demo purposes (customize for real use)
-    if "def" in code_input and "return" in code_input:
-        st.success("Challenge attempt submitted! You've earned 10 points.")
-        st.session_state.points += 10
-    else:
-        st.error("Submission doesn't meet the challenge requirements. Try again.")
-
-    # Get AI feedback
-    feedback = get_feedback(code_input)
-    st.markdown("### AI Feedback")
-    st.write(feedback)
+    st.session_state.code_lines = code_input.split('\n')
+    st.session_state.current_line = 0
+    st.session_state.exec_globals = {}
+    st.success("Code submitted! Start debugging below.")
 
 # Points Display
 st.markdown(f"## Your Points: {st.session_state.points}")
+
+# Debugging Section
+if st.session_state.code_lines:
+    if st.session_state.current_line < len(st.session_state.code_lines):
+        current_line_code = st.session_state.code_lines[st.session_state.current_line]
+        st.markdown(f"### Line {st.session_state.current_line + 1}")
+        st.code(current_line_code)
+
+        # Execute the current line and capture variable states
+        exec_locals = execute_code_line_by_line(st.session_state.code_lines, st.session_state.current_line, st.session_state.exec_globals)
+        
+        # Display current variable states
+        st.markdown("### Current Variables")
+        st.write(exec_locals)
+        
+        if st.button("Next Line"):
+            st.session_state.current_line += 1
+
+        if st.button("Step In"):
+            # Provide more detailed step-in feedback (simulate step-in behavior)
+            feedback = get_feedback(current_line_code)
+            st.markdown("### Step-In Feedback")
+            st.write(feedback)
+        
+        if st.session_state.current_line > 0 and st.button("Step Out"):
+            st.session_state.current_line -= 1
+    else:
+        st.success("End of code reached. Debugging completed.")
 
 # Generate a new challenge
 if st.button("Skip Challenge"):
