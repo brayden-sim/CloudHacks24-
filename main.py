@@ -41,7 +41,7 @@ model = genai.GenerativeModel(
 background_image = """
 <style>
 [data-testid="stAppViewContainer"] > .main {
-    background-image: url("https://coolbackgrounds.io/images/backgrounds/blue/blue-trianglify-8e4a0501.jpg");
+    background-image: url("https://coolbackgrounds.io/images/backgrounds/index/compute-ea4c57a4.png");
     background-size: 100vw 100vh;  # This sets the size to cover 100% of the viewport width and height
     background-position: center;  
     background-repeat: no-repeat;
@@ -186,7 +186,7 @@ if 'solution_revealed' not in st.session_state:
     st.session_state.solution_revealed = False
 
 #NAVIGATION BAR
-page = st_navbar(["Home", "Documentation", "Leaderboard", "About", "Progress"])
+page = st_navbar(["Home", "Leaderboard", "About", "Progress"])
 st.write(page)
 
 if page == "Home":
@@ -352,3 +352,6 @@ elif page == "Progress":
             st.write("No progress data available.")
     else:
         st.write("No progress data available.")
+elif page == "About":
+    st.title("About")
+    st.write("Overcoding is a streamlined platform built on Streamlit, designed for users to enhance their coding skills effectively. Whether you're a novice or an experienced programmer, Overcoding offers tailored learning modules in Easy, Medium, and Hard difficulty levels")
