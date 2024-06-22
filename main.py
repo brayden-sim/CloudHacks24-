@@ -1,9 +1,18 @@
 import streamlit as st
 import streamlit.components.v1 as components
+import streamlit_authenticator as stauth
 import google.generativeai as genai
+import yaml
 import os
 import json
 import random
+import time
+from streamlit_navigation_bar import st_navbar
+from streamlit_lottie import st_lottie 
+
+
+#login
+
 
 # Configure the Gemini API
 genai.configure(api_key="AIzaSyAZ7myOXP5C5GS4wOq5X4yTstZ2ttH5eos")
@@ -32,9 +41,18 @@ st.markdown("""
       text-transform: uppercase;
       font-family: "Montserrat" 
    }
+   div.element-container st-emotion-cache-ifpscm e1f1d6gn4 {
+      left: 200px      
+    }
 </style>
 """, unsafe_allow_html=True)
-    
+
+#load animations
+def load_lottiefile(filepath:str):
+    with open(filepath,"r") as f:
+        return json.load(f)
+lottie_congrats = load_lottiefile("congrats.json");   
+
 # File to store generated challenges
 GENERATED_CHALLENGES_FILE = 'generated_challenges.json'
 
@@ -128,6 +146,10 @@ if 'feedback' not in st.session_state:
 if 'solution_revealed' not in st.session_state:
     st.session_state.solution_revealed = False
 
+#NAVIGATION BAR
+page = st_navbar(["Home", "Documentation", "Leaderboard", "About"])
+st.write(page)
+
 #header
 st.title("OVERCODE.")
 # Select challenge type
@@ -175,6 +197,12 @@ if st.session_state.challenge:
                 points_awarded = {"Easy": 10, "Medium": 20, "Hard": 30}[st.session_state.difficulty]
                 st.session_state.points += points_awarded
                 st.success(f"Correct! You've been awarded {points_awarded} points.")
+                congrats_placeholder = st.empty()
+                with congrats_placeholder:
+                     st_lottie(lottie_congrats, speed=0.75, quality="high", height=200, width=200 )
+                time.sleep(1.5)
+                congrats_placeholder.empty()
+                
             else:
                 st.error("Incorrect. Please try again.")
             st.session_state.solution_revealed = True

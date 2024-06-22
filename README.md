@@ -26,6 +26,10 @@ git clone https://github.com/brayden-sim/CloudHacks24-.git
 2. Install Dependencies
 ```bash
 pip install streamlit google.generativeai
+pip install streamlit
+pip install streamlit-navigation-bar
+pip install streamlit-lottie
+pip install streamlit-authenticator
 ```
 or
 ```bash
