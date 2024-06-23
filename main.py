@@ -7,7 +7,7 @@ import os
 import json
 import random
 import time
-import pickle
+
 import base64
 from pathlib import Path
 from streamlit_navigation_bar import st_navbar
