@@ -2,17 +2,14 @@ import streamlit as st
 import streamlit.components.v1 as components
 import streamlit_authenticator as stauth
 import google.generativeai as genai
-
 import os
 import json
 import random
 import time
-
 import base64
 from pathlib import Path
 from streamlit_navigation_bar import st_navbar
 from streamlit_lottie import st_lottie
-from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -189,7 +186,7 @@ def generate_challenge(difficulty, challenge_type):
 def get_feedback(code, challenge):
     chat_session = model.start_chat(history=[])
     response = chat_session.send_message(
-        f"Evaluate the correctness of this Python code based on the following challenge:\n{challenge}\n\nCode:\n{code}\nIf the code is correct or acceptable, include the string 'Good Job!' in your response."
+        f"Evaluate the correctness of this Python code based on the following challenge:\n{challenge}\n\nCode:\n{code}\nIf the code is correct or acceptable, include the string 'Good Job!' in your response. Do not print Good Job! if the code is wrong and does not complete the challenge."
     )
     return response.text.strip()
 
@@ -221,7 +218,7 @@ if 'solution_revealed' not in st.session_state:
     st.session_state.solution_revealed = False
 
 #NAVIGATION BAR
-page = st_navbar(["Home", "Leaderboard", "About", "Progress"],styles=styles)
+page = st_navbar(["Home", "About", "Progress"],styles=styles)
 st.write(page)
 
 if page == "Home":
