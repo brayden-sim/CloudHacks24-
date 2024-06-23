@@ -14,7 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-
+#st.set_page_config(layout="wide")
 #login
 
 
@@ -35,16 +35,45 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
 )
 #css
-
-
+styles = {
+    "nav": {
+        "background-color": "dark grey",
+        "justify-content": "left",
+        "border-radius": "5px",
+        "-moz-box-shadow": "1px 2px 3px rgba(0,0,0,.5)",
+        "-webkit-box-shadow": "1px 2px 3px rgba(0,0,0,.5)",
+        "box-shadow": "1px 2px 3px rgba(0,0,0,.5)",
+    },
+    "img": {
+        "padding-right": "14px",
+    },
+    "span": {
+               
+        "color": "white",
+        "padding": "14px",
+        "font-family": "Helvetica",
+        "font-size": "25",
+    },
+    "active": {
+        "background-color": "black",
+        "border-radius": "5px",
+        "-moz-box-shadow": "1px 2px 3px rgba(0,0,0,.5)",
+        "-webkit-box-shadow": "1px 2px 3px rgba(0,0,0,.5)",
+        "box-shadow": "1px 2px 3px rgba(0,0,0,.5)",
+        "color": "var(--text-color)",
+        "font-weight": "normal",
+        "padding": "14px",
+        "font-family": "Helvetica"
+    }
+}
 
 background_image = """
 <style>
 [data-testid="stAppViewContainer"] > .main {
     background-image: url("https://coolbackgrounds.io/images/backgrounds/index/compute-ea4c57a4.png");
-    background-size: 100vw 100vh;  # This sets the size to cover 100% of the viewport width and height
     background-position: center;  
     background-repeat: no-repeat;
+    object-fit: cover
 }
 </style>
 """
@@ -186,7 +215,7 @@ if 'solution_revealed' not in st.session_state:
     st.session_state.solution_revealed = False
 
 #NAVIGATION BAR
-page = st_navbar(["Home", "Leaderboard", "About", "Progress"])
+page = st_navbar(["Home", "Leaderboard", "About", "Progress"],styles=styles)
 st.write(page)
 
 if page == "Home":
