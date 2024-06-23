@@ -107,6 +107,15 @@ lottie_congrats = load_lottiefile("congrats.json");
 GENERATED_CHALLENGES_FILE = 'generated_challenges.json'
 PROGRESS_FILE = 'progress.json'
 
+def clear_json_file(file_path):
+    with open(file_path, 'w') as file:
+        json.dump([], file, indent=4)
+
+# Clear the JSON files at the start, but only once per session
+if 'initialized' not in st.session_state:
+    clear_json_file(GENERATED_CHALLENGES_FILE)
+    clear_json_file(PROGRESS_FILE)
+    st.session_state.initialized = True
 
 # Load generated challenges
 if os.path.exists(GENERATED_CHALLENGES_FILE):
@@ -119,12 +128,10 @@ else:
     generated_challenges = []
 
 # Function to record challenge completion
-def record_challenge_completion(challenge_type, difficulty, time_taken):
+def record_challenge_completion(challenge_type, difficulty):
     progress_data = {
         "challenge_type": challenge_type,
-        "difficulty": difficulty,
-        "time_taken": time_taken,
-        "timestamp": time.time()
+        "difficulty": difficulty
     }
     
     if os.path.exists(PROGRESS_FILE):
@@ -272,6 +279,7 @@ if page == "Home":
                         st_lottie(lottie_congrats, speed=0.75, quality="high", height=200, width=200 )
                     time.sleep(1.5)
                     congrats_placeholder.empty()
+                    record_challenge_completion(challenge_type, difficulty)
 
                 else:
                     st.error("Incorrect. Please try again.")
@@ -340,7 +348,7 @@ if page == "Home":
         <button onclick="speakElement('joke-text')">👂 Read Joke!</button>
         <p id="joke-text" style="display:none">{joke}</p>
         """, height=60)
-        
+
 elif page == "Progress":
     st.title("Progress")
     
@@ -361,26 +369,26 @@ elif page == "Progress":
             st.write("#### Distribution of Challenge Types")
             st.pyplot(fig1)
             
+            # Define the difficulty mapping
+            difficulty_order = ['Easy', 'Medium', 'Hard']
+
             # Bar chart of difficulty levels
-            difficulty_counts = df['difficulty'].value_counts()
+            difficulty_counts = df['difficulty'].value_counts().reindex(difficulty_order, fill_value=0)
             fig2, ax2 = plt.subplots()
             ax2.bar(difficulty_counts.index, difficulty_counts)
             ax2.set_xlabel("Difficulty Level")
             ax2.set_ylabel("Number of Challenges")
+            ax2.set_xticks(range(len(difficulty_order)))  # Set x-ticks to match the difficulty categories
+            ax2.set_xticklabels(difficulty_order)  # Set x-tick labels to the difficulty categories
+            ax2.set_yticks(range(1, 11))  # Set y-ticks to integers from 1 to 10
             st.write("#### Challenges by Difficulty Level")
             st.pyplot(fig2)
+
             
-            # Histogram of time taken
-            fig3, ax3 = plt.subplots()
-            ax3.hist(df['time_taken'], bins=10)
-            ax3.set_xlabel("Time Taken (seconds)")
-            ax3.set_ylabel("Number of Challenges")
-            st.write("#### Time Taken for Challenges")
-            st.pyplot(fig3)
         else:
             st.write("No progress data available.")
     else:
         st.write("No progress data available.")
 elif page == "About":
     st.title("About")
-    st.write("Overcoding is a streamlined platform built on Streamlit, designed for users to enhance their coding skills effectively. Whether you're a novice or an experienced programmer, Overcoding offers tailored learning modules in Easy, Medium, and Hard difficulty levels")
+    st.write("Overcode is a streamlined platform built on Streamlit, designed for users to enhance their coding skills effectively. Whether you're a novice or an experienced programmer, Overcode offers tailored learning modules in Easy, Medium, and Hard difficulty levels")
