@@ -11,8 +11,43 @@ Empower yourself to write better code and achieve your programming goals with Co
 <ul>
   <li>Interactive coding exercises with real-time feedback</li>
   <li>AI-generated assessments to evaluate code quality and efficiency</li>
-  <li>Code debugging tools to identify and resolve errors</li>
+  <li>Jokes to make your day! (with built-in TTS function)</li>
   <li>Progress tracking and point system to motivate learning</li>
+</ul>
+
+## How we built it
+Overcode was developed using Streamlit for its interactive and user-friendly interface. Key components include:
+
+Frontend: Streamlit for real-time rendering of coding exercises and feedback.
+Backend: Python integrated with AI models to assess and provide feedback on code quality.
+Libraries and Tools:
+<ul>
+  <li>streamlit for the application framework.</li>
+  <li>google.generativeai for AI feedback.</li>
+  <li>streamlit-navigation-bar for easy navigation.</li>
+  <li>streamlit-lottie for animations.</li>
+  <li>streamlit-authenticator for user authentication.</li>
+</ul>
+
+## Challenges we ran into
+<ul>
+  <li>Real-Time Feedback Accuracy: Ensuring that AI-generated feedback is both accurate and useful.</li>
+  <li>Challenge Duplication: Generating unique challenges each time to avoid repetition.</li>
+  <li>Point System Integrity: Preventing users from exploiting the points system by repeatedly submitting the same solution.</li>
+  <li>User Experience: Balancing the complexity of the interface with ease of use, especially for beginners.</li>
+</ul>
+
+## Accomplishments that we're proud of
+<ul>
+  <li>Seamless AI Integration: Successfully implementing AI that provides insightful and actionable feedback.</li>
+  <li>Dynamic Learning Paths: Creating a system that adjusts difficulty based on user performance.</li>
+  <li>Robust Progress Tracking: Developing a motivational points and badge system that accurately reflects user achievements.</li>
+</ul>
+
+## What we learned
+<ul>
+<li>Effective AI Utilization: Gained insights into integrating AI for educational feedback purposes.</li>
+<li>Streamlit Capabilities: Explored the extensive functionalities of Streamlit for creating interactive web applications.</li>
 </ul>
 
 ## Installation and Usage
