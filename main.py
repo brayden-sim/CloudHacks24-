@@ -2,22 +2,20 @@ import streamlit as st
 import streamlit.components.v1 as components
 import streamlit_authenticator as stauth
 import google.generativeai as genai
-import yaml
+
 import os
 import json
 import random
 import time
+import pickle
 import base64
+from pathlib import Path
 from streamlit_navigation_bar import st_navbar
 from streamlit_lottie import st_lottie
-import pymongo
-from deta import Deta
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-#
-#st.set_page_config(layout="wide")
-#login
 
 # Configure the Gemini API
 genai.configure(api_key="AIzaSyAZ7myOXP5C5GS4wOq5X4yTstZ2ttH5eos")
@@ -49,7 +47,7 @@ styles = {
         "padding-right": "14px",
     },
     "span": {
-               
+            
         "color": "white",
         "padding": "14px",
         "font-family": "Helvetica",
@@ -86,14 +84,14 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');        
     h1 {
-      font-size: 60px;
-      font-weight: 700
-      text-align: left;
-      text-transform: uppercase;
-      font-family: "Montserrat" 
-   }
-   div.element-container st-emotion-cache-ifpscm e1f1d6gn4 {
-      left: 200px      
+    font-size: 60px;
+    font-weight: 700
+    text-align: left;
+    text-transform: uppercase;
+    font-family: "Montserrat" 
+}
+div.element-container st-emotion-cache-ifpscm e1f1d6gn4 {
+    left: 200px      
     }
 </style>
 """, unsafe_allow_html=True)
