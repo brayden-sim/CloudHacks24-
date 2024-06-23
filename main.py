@@ -391,3 +391,5 @@ elif page == "Progress":
 elif page == "About":
     st.title("About")
     st.write("Overcoding is a streamlined platform built on Streamlit, designed for users to enhance their coding skills effectively. Whether you're a novice or an experienced programmer, Overcoding offers tailored learning modules in Easy, Medium, and Hard difficulty levels")
+    st.write("With AI-powered feedback, Overcoding evaluates your code submissions instantly, providing insightful critiques and suggestions for improvement. This interactive feature ensures that you receive personalized guidance to refine your coding techniques and tackle challenges with confidence :)")
+    st.write("Start mastering coding fundamentals and advancing your skills in a supportive learning environment. Empower yourself to write better code and achieve your programming goals with CodeMentor's intuitive platform. Take the next step in your coding journey today!")
