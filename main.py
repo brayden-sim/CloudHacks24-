@@ -1,13 +1,10 @@
 import streamlit as st
 import streamlit.components.v1 as components
-import streamlit_authenticator as stauth
 import google.generativeai as genai
 import os
 import json
 import random
 import time
-import base64
-from pathlib import Path
 from streamlit_navigation_bar import st_navbar
 from streamlit_lottie import st_lottie
 import pandas as pd
